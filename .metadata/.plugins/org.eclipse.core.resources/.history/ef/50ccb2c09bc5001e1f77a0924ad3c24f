@@ -1,0 +1,84 @@
+package com.app.entities;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Value;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "user_info")
+@Value
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private int userId;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
+    private String about;
+
+    @Column(nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(name = "CreateAt",nullable = false)
+    private Date date;
+
+    private boolean active;
+
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles = new HashSet<>();
+
+    // Constructors
+
+    public User() {
+        // Default constructor
+    }
+
+    public User(String name, String email, String password, String address, String about, String gender,
+                String phone, Date date, boolean active) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.about = about;
+        this.gender = gender;
+        this.phone = phone;
+        this.date = date;
+        this.active = active;
+    }
+
+    // Getters and setters for other properties...
+
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        List<SimpleGrantedAuthority> collect = this.roles.stream()
+//                .map(role -> new SimpleGrantedAuthority(role.getName()))
+//                .collect(Collectors.toList());
+//
+//        return collect;
+//    }
+
+    
+}

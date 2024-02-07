@@ -1,0 +1,46 @@
+package com.app.dto;
+
+import java.util.List;
+
+import com.app.entities.Product;
+public class ProductResponse {
+
+    private final List<ProductDTO> content;
+    private final int pageNumber;
+    private final int pageSize;
+    private final int totalPages;
+    private final boolean lastPage;
+    
+
+    public ProductResponse() {
+		super();
+	}
+
+	public ProductResponse(List<ProductDTO> content, int pageNumber, int pageSize, int totalPages, boolean lastPage) {
+        this.content = content;
+        this.pageNumber = pageNumber;
+        this.pageSize = pageSize;
+        this.totalPages = totalPages;
+        this.lastPage = lastPage;
+    }
+
+    public List<ProductDTO> getContent() {
+        return content;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public boolean isLastPage() {
+        return lastPage;
+    }
+}
