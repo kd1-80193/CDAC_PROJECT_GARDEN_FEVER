@@ -1,16 +1,19 @@
 package com.app.dto;
 
+import com.app.entities.Category;
+
 public class ProductDTO {
-    private int product_id;
+	private int product_id;
     private String product_name;
     private double product_price;
     private String product_imageName;
     private int product_quantity;
-    private boolean stock;
+    private boolean stock = true;
     private boolean live;
     private String product_description;
-
-    public ProductDTO() {
+    
+    
+	    public ProductDTO() {
         super();
     }
 
@@ -97,4 +100,17 @@ public class ProductDTO {
                 + product_price + ", product_imageName=" + product_imageName + ", product_quantity=" + product_quantity
                 + ", stock=" + stock + ", live=" + live + ", product_description=" + product_description + "]";
     }
+  
+        private CategoryDto category;
+
+        // Getter and Setter for Category
+        public CategoryDto getCategory() {
+            return category;
+        }
+
+        public void setCategory(CategoryDto category) {
+            this.category = category;
+        }
+    
+    
 }
