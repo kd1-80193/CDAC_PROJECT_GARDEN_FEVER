@@ -1,0 +1,68 @@
+//package com.app.entities;
+//
+//import java.util.HashSet;
+//import java.util.Set;
+//
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
+//import javax.persistence.ManyToMany;
+//
+//
+//
+//@Entity
+//public class Role {
+//    @Id
+//    @Column(name="Role_ID",nullable = false)
+//	private int roleId;
+//    
+//    @Column(name="Role_Name",nullable = false)
+//	private String roleName;
+//    
+//	@ManyToMany(mappedBy = "roles")
+//	Set<User> user=new HashSet<>();
+//	
+//	public Set<User> getUser() {
+//		return user;
+//	}
+//
+//	public void setUser(Set<User> user) {
+//		this.user = user;
+//	}
+//
+//	public int getRoleId() {
+//		return roleId;
+//	}
+//
+//	public void setRoleId(int roleId) {
+//		this.roleId = roleId;
+//	}
+//
+//	public String getRoleName() {
+//		return roleName;
+//	}
+//
+//	public void setRoleName(String roleName) {
+//		this.roleName = roleName;
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "Role [roleId=" + roleId + ", roleName=" + roleName + ", user=" + user + "]";
+//	}
+//
+//	public Role(int roleId, String roleName, Set<User> user) {
+//		super();
+//		this.roleId = roleId;
+//		this.roleName = roleName;
+//		this.user = user;
+//	}
+//
+//	public Role() {
+//		super();
+//	}
+//
+//	
+//	
+//	
+//}

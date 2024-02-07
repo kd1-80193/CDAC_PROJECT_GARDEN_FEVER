@@ -5,12 +5,12 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.custom_exceptions.ResourceNotFoundException;
 import com.app.dto.UserDto;
 import com.app.entities.User;
-import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
 
 @Service
@@ -20,14 +20,11 @@ public class UserService {
 	private UserRepository userRepo;
 
 	@Autowired
-	private RoleRepository roleRepository;
-
-	// @Autowired
-	// private PasswordEncoder passwordEncoder;
-
-	@Autowired
 	private ModelMapper mapper;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 //    public UserDto create(UserDto userDto) {
 //        User user = this.toEntity(userDto);
 //      String encodedPassword = this.passwordEncoder.encode(user.getPassword());
@@ -37,8 +34,15 @@ public class UserService {
 //    }
 
 	public UserDto create(UserDto userDto) {
+		
 		// userdto to user
 		User user = this.mapper.map(userDto, User.class);
+		
+		String pass=user.getPassword();
+		String encodedPassword = this.passwordEncoder.encode(pass);
+		System.out.println("Ende: "+encodedPassword);
+		user.setPassword(encodedPassword);
+		
 		// save
 		User saveUser = this.userRepo.save(user);
 		// user to userdto
@@ -79,22 +83,22 @@ public class UserService {
 	}
 
 	public UserDto getById(int userId) {
-	    User foundUser = this.userRepo.findById(userId)
-	            .orElseThrow(() -> new ResourceNotFoundException("User not found by this id: " + userId));
+		User foundUser = this.userRepo.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found by this id: " + userId));
 
-	    return this.toDto(foundUser);
+		return this.toDto(foundUser);
 	}
 
 	public UserDto toDto(User user) {
-	    return this.mapper.map(user, UserDto.class);
+		return this.mapper.map(user, UserDto.class);
 	}
-
 
 	public UserDto getByEmailId(String emailId) {
 		User foundUser = userRepo.findByEmail(emailId)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found by email: " + emailId));
 		return this.toDto(foundUser);
 	}
+
 //
 //	public UserDto toDto(User user) {
 //		return this.mapper.map(user, UserDto.class);

@@ -1,26 +1,50 @@
 package com.app.entities;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Role {
     @Id
-	private int id;
-	private String name;
-	@ManyToMany(mappedBy = "roles")
+    @Column(nullable = false)
+	private int roleId;
+    
+    @Column(nullable = false)
+	private String roleName;
+    
+	@ManyToMany(mappedBy = "role")
 	Set<User> user=new HashSet<>();
-	
+
+	public int getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(int roleId) {
+		this.roleId = roleId;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+
 	public Set<User> getUser() {
 		return user;
 	}
@@ -28,35 +52,10 @@ public class Role {
 	public void setUser(Set<User> user) {
 		this.user = user;
 	}
-
-	public Role(int id, String name, Set<User> users) {
-		super();
-		this.id = id;
-		this.name = name;
-		
-	}
 	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Role(int id, String name) {
-		super();
-		this.id = id;
-		this.name = name;
-	}
-	public Role() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+
+
+	
 	
 	
 }

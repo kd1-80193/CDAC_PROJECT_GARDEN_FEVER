@@ -1,0 +1,262 @@
+package com.app.service;
+
+import java.util.List;
+
+import java.util.stream.Collectors;
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.app.custom_exceptions.ResourceNotFoundException;
+import com.app.dto.CategoryDto;
+import com.app.dto.ProductDTO;
+import com.app.dto.ProductResponse;
+import com.app.entities.Category;
+import com.app.entities.Product;
+import com.app.repository.CategoryRepository;
+import com.app.repository.ProductRepository;
+
+@Service
+@Lazy
+public class ProductService {
+	@Autowired
+	private ProductRepository productRepo;
+
+	@Autowired
+	private ProductService productService;
+	@Autowired
+	private CategoryRepository catRepo;
+
+
+	    @Autowired
+	    public ProductService(@Lazy ProductRepository productRepo) {
+	        this.productRepo = productRepo;
+	    }
+	
+	    public ProductDTO createProduct(ProductDTO product, int catId) {
+	        // Fetch category or throw ResourceNotFoundException
+	        Category cat = catRepo.findById(catId)
+	                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + catId));
+
+	        // Convert ProductDTO to Product entity
+	        Product entity = toEntity(product);
+	        
+	        // Set the category for the product
+	        entity.setCategory(cat);
+
+	        // Save the product entity and update the category association
+	        Product savedProduct = productRepo.save(entity);
+
+	        // Convert saved product entity to ProductDTO
+	        ProductDTO dto = toDTO(savedProduct);
+
+	        return dto;
+	    }
+
+
+	public List<ProductDTO> viewAll() {
+		List<Product> findAll = productRepo.findAll();
+
+		// Using Java Stream to convert each Product to ProductDTO
+		List<ProductDTO> findAllDto = findAll.stream().map(product -> this.toDTO(product)).collect(Collectors.toList());
+
+		return findAllDto;
+	}
+
+//	public ProductResponse viewAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
+//		// Default to ascending if sort direction is not specified or invalid
+//		Sort.Direction direction = Sort.Direction.ASC;
+//		if (sortDir != null && sortDir.trim().equalsIgnoreCase("desc")) {
+//			direction = Sort.Direction.DESC;
+//		} else if (sortDir != null && !sortDir.trim().equalsIgnoreCase("asc")) {
+//			throw new IllegalArgumentException("Invalid sortDir parameter: " + sortDir);
+//		}
+//
+//		// Create a Sort object based on the specified field and direction
+//		Sort sort = Sort.by(direction, sortBy);
+//
+//		// Create a Pageable object for pagination
+//		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+//
+//		// Retrieve a paginated list of live products
+//		Page<Product> page = productRepo.findAll(pageable);
+//		List<Product> pageProduct = page.getContent();
+//
+//		// Filter live products and convert to DTO
+//		List<ProductDTO> productDto = pageProduct.stream().map(p -> this.toDTO(p)).collect(Collectors.toList());
+//
+//		// Create a ProductResponse (not sure how you intend to use this)
+//		ProductResponse response = new ProductResponse();
+//		response.setContent(productDto);
+//		response.setPageNumber(page.getNumber());
+//		response.setPageSize(page.getSize());
+//		response.setTotalPages(page.getTotalPages());
+//		response.setLastPage(page.isLast());
+//
+//		return response;
+//	}
+
+	    
+	    
+//	public ProductResponse viewAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
+//        // Validate page number and page size
+//        if (pageNumber < 0 || pageSize <= 0) {
+//            throw new IllegalArgumentException("Invalid page number or page size");
+//        }
+//
+//        // Default to ascending if sort direction is not specified or invalid
+//        Sort.Direction direction = Sort.Direction.ASC;
+//        if (sortDir != null) {
+//            if (sortDir.trim().equalsIgnoreCase("desc")) {
+//                direction = Sort.Direction.DESC;
+//            } else if (!sortDir.trim().equalsIgnoreCase("asc")) {
+//                throw new IllegalArgumentException("Invalid sortDir parameter: " + sortDir);
+//            }
+//        }
+//
+//        // Create a Sort object based on the specified field and direction
+//        Sort sort = Sort.by(direction, sortBy);
+//
+//        // Create a Pageable object for pagination
+//        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+//
+//        try {
+//            // Retrieve a paginated list of live products
+//            Page<Product> page = productRepo.findAll(pageable);
+//            List<Product> pageProduct = page.getContent();
+//
+//            // Convert to DTO
+//            List<ProductDTO> productDto = pageProduct.stream().map(this::toDTO).collect(Collectors.toList());
+//
+//            // Create a ProductResponse
+//            ProductResponse response = new ProductResponse();
+//            response.setContent(productDto);
+//            response.setPageNumber(page.getNumber());
+//            response.setPageSize(page.getSize());
+//            response.setTotalPages(page.getTotalPages());
+//            response.setLastPage(page.isLast());
+//
+//            return response;
+//
+//        } catch (Exception e) {
+//        }
+//            // Log the exception
+////            logger.error("An error occurred while fetching products", e);
+////
+////            // Rethrow or handle the exception based on your application's requirements
+////            throw new RuntimeException("An error occurred while fetching products", e);
+//		return null;
+//    }
+
+	    
+	    
+	public ProductDTO viewProductById(int productId) {
+	    Product product = productRepo.findById(productId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+
+	    return toDTO(product);
+	}
+
+
+	public void deleteProduct(int productId) {
+
+		Product byId = productRepo.findById(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("id " + productId + " not found"));
+		;
+		productRepo.deleteById(productId);
+	}
+
+	public ProductDTO updateProduct(int productId, ProductDTO updatedProduct) {
+		Product existingProduct = productRepo.findById(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("id " + productId + " not found"));
+
+//		existingProduct.setProduct_name(updatedProduct.getProduct_name());
+//		existingProduct.setProduct_price(updatedProduct.getProduct_price());
+//		existingProduct.setProduct_imageName(updatedProduct.getProduct_imageName());
+//		existingProduct.setProduct_quantity(updatedProduct.getProduct_quantity());
+//		existingProduct.setStock(updatedProduct.isStock());
+//		existingProduct.setLive(updatedProduct.isLive());
+//		existingProduct.setProduct_description(updatedProduct.getProduct_description());
+
+		existingProduct.setProduct_name(updatedProduct.getProduct_name());
+		existingProduct.setProduct_price(updatedProduct.getProduct_price());
+		existingProduct.setProduct_imageName(updatedProduct.getProduct_imageName());
+		existingProduct.setProduct_quantity(updatedProduct.getProduct_quantity());
+		existingProduct.setStock(updatedProduct.isStock());
+		existingProduct.setLive(updatedProduct.isLive());
+		existingProduct.setProduct_description(updatedProduct.getProduct_description());
+
+		Product save = productRepo.save(existingProduct);
+
+		ProductDTO dto = toDTO(save);
+		return dto;
+
+	}
+	
+	// get product by category
+		@GetMapping("/category/{catId}")
+	public ResponseEntity<List<Product>> getProductByCategory(@PathVariable int catId) {
+			List<ProductDTO> findProductByCategory = this.productService.findProductByCategory(catId);
+			return new ResponseEntity<List<Product>>(HttpStatus.ACCEPTED);
+	}
+		
+	public List<ProductDTO>findProductByCategory(int catId){
+			Category cat=this.catRepo.findById(catId).orElseThrow(()->new ResourceNotFoundException("this id category nor found"));
+			List<Product> findByCategory=this.productRepo.findByCategory(cat);
+			List<ProductDTO> collect=findByCategory.stream().map(product ->toDTO(product)).collect(Collectors.toList());
+			return collect;
+			
+	}
+
+	// productdto to product
+	public Product toEntity(ProductDTO pDTO) {
+		Product p = new Product();
+		// Exclude product_id because it's typically generated by the database
+		p.setProduct_name(pDTO.getProduct_name());
+		p.setProduct_price(pDTO.getProduct_price());
+		p.setProduct_imageName(pDTO.getProduct_imageName());
+		p.setProduct_quantity(pDTO.getProduct_quantity());
+		p.setStock(pDTO.isStock());
+		p.setLive(pDTO.isLive());
+		p.setProduct_description(pDTO.getProduct_description());
+
+		return p;
+	}
+
+	// product to productdto
+	public ProductDTO toDTO(Product product) {
+		ProductDTO pDTO = new ProductDTO(0, null, 0, null, 0, false, false, null);
+		pDTO.setProduct_id(product.getProduct_id());
+		pDTO.setProduct_name(product.getProduct_name());
+		pDTO.setProduct_price(product.getProduct_price());
+		pDTO.setProduct_imageName(product.getProduct_imageName());
+		pDTO.setProduct_quantity(product.getProduct_quantity());
+		pDTO.setStock(product.isStock());
+		pDTO.setLive(product.isLive());
+		pDTO.setProduct_description(product.getProduct_description());
+
+		// Null check for the Category
+		if (product.getCategory() != null) {
+			CategoryDto catDto = new CategoryDto();
+			catDto.setCategoryId(product.getCategory().getCategoryId());
+			catDto.setTittle(product.getCategory().getTittle());
+			pDTO.setCategory(catDto);
+		}
+
+		return pDTO;
+	}
+
+	
+
+}

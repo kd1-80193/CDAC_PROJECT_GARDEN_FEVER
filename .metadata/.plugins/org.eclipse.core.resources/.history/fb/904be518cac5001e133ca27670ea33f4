@@ -1,0 +1,62 @@
+package com.app.config;
+
+import java.util.Collection;
+import java.util.Collections;
+
+import javax.security.auth.login.AccountExpiredException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import com.app.repository.*;
+import com.app.custom_exceptions.ResourceNotFoundException;
+import com.app.entities.User;
+
+
+	@Service
+	public class CustomerUserDetailService implements UserDetailsService {
+
+	    @Autowired
+	    private UserRepository userRepo;
+
+	    @Override
+	    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	        User user = this.userRepo.findByEmail(username)
+	                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+	        // Check if the user account is expired
+	        if (user.isAccountNonExpired()) {
+	            // You can add additional checks here if needed
+
+	            // Return the user details
+	            return buildUserDetails(user);
+	        } else {
+	            // Throw an exception or handle the expired account scenario
+	        	   throw new AccountExpiredException("User account has expired");
+	        }
+	    }
+
+	    private UserDetails buildUserDetails(User user) {
+	        // Extract user roles and create a list of GrantedAuthority
+	        Collection<? extends GrantedAuthority> authorities =
+	                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+
+	        // Create UserDetails object with necessary information
+	        return new org.springframework.security.core.userdetails.User(
+	                user.getEmail(),
+	                user.getPassword(),
+	                true, // Account is not locked
+	                true, // Account is not expired
+	                true, // Credentials are not expired
+	                true, // Account is enabled
+	                authorities
+	        );
+	    }
+
+
+}

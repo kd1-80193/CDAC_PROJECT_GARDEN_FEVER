@@ -32,18 +32,15 @@ public class ProductController {
 
 	@Autowired
 	public ProductController(ProductService productService) {
-	    this.productService = productService;
+		this.productService = productService;
 	}
-
 
 	@PostMapping("/create/{catId}")
 	@ResponseBody
 	public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO product, @PathVariable int catId) {
-	    ProductDTO createProduct = productService.createProduct(product, catId);
-	    return new ResponseEntity<>(createProduct, HttpStatus.CREATED);
+		ProductDTO createProduct = productService.createProduct(product, catId);
+		return new ResponseEntity<>(createProduct, HttpStatus.CREATED);
 	}
-
-
 
 	// viewProduct
 //	@RequestMapping("/viewAll")
@@ -58,8 +55,8 @@ public class ProductController {
 
 	@RequestMapping("/viewAll")
 	public ResponseEntity<List<ProductDTO>> viewAllProduct() {
-	    List<ProductDTO> viewAll = productService.viewAll();
-	    return new ResponseEntity<List<ProductDTO>>(viewAll,HttpStatus.ACCEPTED);
+		List<ProductDTO> viewAll = productService.viewAll();
+		return new ResponseEntity<List<ProductDTO>>(viewAll, HttpStatus.ACCEPTED);
 	}
 
 	// view productById
@@ -94,14 +91,13 @@ public class ProductController {
 
 	@GetMapping("/products/category/{catId}")
 	public ResponseEntity<List<ProductDTO>> getProductByCategory(@PathVariable Integer catId) {
-	    if (catId == null) {
-	        // Handle the case when catId is not provided
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	    }
+		if (catId == null) {
+			// Handle the case when catId is not provided
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 
-	    List<ProductDTO> findProductByCategory = this.productService.findProductByCategory(catId);
-	    return new ResponseEntity<>(findProductByCategory, HttpStatus.OK);
+		List<ProductDTO> findProductByCategory = this.productService.findProductByCategory(catId);
+		return new ResponseEntity<>(findProductByCategory, HttpStatus.OK);
 	}
-
 
 }

@@ -4,8 +4,6 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -38,32 +36,30 @@ public class ProductService {
 	@Autowired
 	private CategoryRepository catRepo;
 
+	@Autowired
+	public ProductService(@Lazy ProductRepository productRepo) {
+		this.productRepo = productRepo;
+	}
 
-	    @Autowired
-	    public ProductService(@Lazy ProductRepository productRepo) {
-	        this.productRepo = productRepo;
-	    }
-	
-	    public ProductDTO createProduct(ProductDTO product, int catId) {
-	        // Fetch category or throw ResourceNotFoundException
-	        Category cat = catRepo.findById(catId)
-	                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + catId));
+	public ProductDTO createProduct(ProductDTO product, int catId) {
+		// Fetch category or throw ResourceNotFoundException
+		Category cat = catRepo.findById(catId)
+				.orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + catId));
 
-	        // Convert ProductDTO to Product entity
-	        Product entity = toEntity(product);
-	        
-	        // Set the category for the product
-	        entity.setCategory(cat);
+		// Convert ProductDTO to Product entity
+		Product entity = toEntity(product);
 
-	        // Save the product entity and update the category association
-	        Product savedProduct = productRepo.save(entity);
+		// Set the category for the product
+		entity.setCategory(cat);
 
-	        // Convert saved product entity to ProductDTO
-	        ProductDTO dto = toDTO(savedProduct);
+		// Save the product entity and update the category association
+		Product savedProduct = productRepo.save(entity);
 
-	        return dto;
-	    }
+		// Convert saved product entity to ProductDTO
+		ProductDTO dto = toDTO(savedProduct);
 
+		return dto;
+	}
 
 	public List<ProductDTO> viewAll() {
 		List<Product> findAll = productRepo.findAll();
@@ -107,8 +103,6 @@ public class ProductService {
 //		return response;
 //	}
 
-	    
-	    
 //	public ProductResponse viewAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
 //        // Validate page number and page size
 //        if (pageNumber < 0 || pageSize <= 0) {
@@ -159,35 +153,21 @@ public class ProductService {
 //		return null;
 //    }
 
-	    
-	    
 	public ProductDTO viewProductById(int productId) {
-	    Product product = productRepo.findById(productId)
-	            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
-
-	    return toDTO(product);
+		Product product = productRepo.findById(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+		return toDTO(product);
 	}
 
-
 	public void deleteProduct(int productId) {
-
 		Product byId = productRepo.findById(productId)
 				.orElseThrow(() -> new ResourceNotFoundException("id " + productId + " not found"));
-		;
 		productRepo.deleteById(productId);
 	}
 
 	public ProductDTO updateProduct(int productId, ProductDTO updatedProduct) {
 		Product existingProduct = productRepo.findById(productId)
 				.orElseThrow(() -> new ResourceNotFoundException("id " + productId + " not found"));
-
-//		existingProduct.setProduct_name(updatedProduct.getProduct_name());
-//		existingProduct.setProduct_price(updatedProduct.getProduct_price());
-//		existingProduct.setProduct_imageName(updatedProduct.getProduct_imageName());
-//		existingProduct.setProduct_quantity(updatedProduct.getProduct_quantity());
-//		existingProduct.setStock(updatedProduct.isStock());
-//		existingProduct.setLive(updatedProduct.isLive());
-//		existingProduct.setProduct_description(updatedProduct.getProduct_description());
 
 		existingProduct.setProduct_name(updatedProduct.getProduct_name());
 		existingProduct.setProduct_price(updatedProduct.getProduct_price());
@@ -203,20 +183,21 @@ public class ProductService {
 		return dto;
 
 	}
-	
+
 	// get product by category
-		@GetMapping("/category/{catId}")
+	@GetMapping("/category/{catId}")
 	public ResponseEntity<List<Product>> getProductByCategory(@PathVariable int catId) {
-			List<ProductDTO> findProductByCategory = this.productService.findProductByCategory(catId);
-			return new ResponseEntity<List<Product>>(HttpStatus.ACCEPTED);
+		List<ProductDTO> findProductByCategory = this.productService.findProductByCategory(catId);
+		return new ResponseEntity<List<Product>>(HttpStatus.ACCEPTED);
 	}
-		
-	public List<ProductDTO>findProductByCategory(int catId){
-			Category cat=this.catRepo.findById(catId).orElseThrow(()->new ResourceNotFoundException("this id category nor found"));
-			List<Product> findByCategory=this.productRepo.findByCategory(cat);
-			List<ProductDTO> collect=findByCategory.stream().map(product ->toDTO(product)).collect(Collectors.toList());
-			return collect;
-			
+
+	public List<ProductDTO> findProductByCategory(int catId) {
+		Category cat = this.catRepo.findById(catId)
+				.orElseThrow(() -> new ResourceNotFoundException("this id category nor found"));
+		List<Product> findByCategory = this.productRepo.findByCategory(cat);
+		List<ProductDTO> collect = findByCategory.stream().map(product -> toDTO(product)).collect(Collectors.toList());
+		return collect;
+
 	}
 
 	// productdto to product
@@ -256,7 +237,5 @@ public class ProductService {
 
 		return pDTO;
 	}
-
-	
 
 }

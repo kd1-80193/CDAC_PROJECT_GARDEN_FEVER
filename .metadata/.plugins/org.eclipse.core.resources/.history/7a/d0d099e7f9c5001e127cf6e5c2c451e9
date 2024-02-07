@@ -1,0 +1,24 @@
+package com.app.config;
+
+
+
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Implement your user retrieval logic here
+        // You should return an instance of UserDetails based on the given username
+
+        // Example:
+        // UserDetails userDetails = userRepository.findByUsername(username);
+        // if (userDetails == null) {
+        //     throw new UsernameNotFoundException("User not found with username: " + username);
+        // }
+        // return userDetails;
+    }
+}
